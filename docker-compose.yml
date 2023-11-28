@@ -1,0 +1,36 @@
+services:
+  webserver_dns:
+    container_name: webserver_dns
+    image: ubuntu/bind9:latest
+    # usamos esta imagen para poder ver los logs
+    # la imagen de internetsystemsconsortium/bind9
+    # no muestra los logs
+    ports:
+      - 53:53
+    networks:
+      webserver_subnet:
+        ipv4_address: 172.22.0.254
+    volumes:
+      - ./bind9/conf:/etc/bind
+      - ./bind9/zonas:/var/lib/bind
+    dns:
+      - 172.22.0.254
+  webserver:
+    image: httpd:latest
+    container_name: webserver
+    ports:
+      - "80:80"
+    volumes:
+      - ./apache/htdocs:/usr/local/apache2/htdocs
+      - ./apache/conf:/usr/local/apache2/conf
+    networks:
+      webserver_subnet:
+        ipv4_address: 172.22.0.10
+networks:
+  webserver_subnet:
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.22.0.0/24
+
+  

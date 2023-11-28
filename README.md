@@ -77,4 +77,64 @@ www	IN A		172.22.0.10
 ```
 ### Creación de un directorio para cada dominio en el volumen de htdocs
 Creamos un directorio para cada unos de los dominios dentro de la carpeta del anfitrión que tenemos asignada como volumen de `htdocs` del contenedor Apache. En este caso, los llamamos `www1` y `www2`, y creamos un `index.html` en cada uno.
+### Configuración de los virtual hosts en Apache
+Editamos el archivo `httpd.conf` para agregar el redireccionamiento de cada dominio a cada unos de los directorios que hemos creado. Para ello, añadimos las siguientes líneas al archivo:
+```
+#VirtualHost 
+NameVirtualHost *:80
 
+<VirtualHost *:80>
+ServerName www.fabulasmaravillosas.int
+ServerAlias fabulasmaravillosas.int *.fabulasmaravillosas.int
+DocumentRoot /usr/local/apache2/htdocs/www1
+</VirtualHost>
+
+<VirtualHost *:80>
+ServerName www.fabulasoscuras.int
+ServerAlias fabulasoscuras.int *.fabulasoscuras.int
+DocumentRoot /usr/local/apache2/htdocs/www2
+</VirtualHost>
+```
+En el DocumentRoot especificamos la ruta absoluta al directorio que contiene el `index.html` adecuado. En ServerName el nombre del dominio principal, y en ServerAlias podemos especificar subdominios del mismo.
+## Comprobación del funcionamiento desde el propio servidor DNS
+De esta manera podemos comprobar que el servidor DNS y el Apache funcionan correctamente. Para ello, abriendo una terminal en el servidor DNS instalamos el navegador web de consola `Lynx` usando el siguiente comando:
+```console
+sudo apt install lynx
+```
+Una vez instalado, navegamos a cada uno de los dominios y comprobamos que se muestra el `index.html` correcto. Como el servidor DNS está configurado para resolver por si mismo las direcciones, debemos poder acceder a dichos dominios. Para ello, introducimos los siguientes comandos:
+```console
+lynx www.fabulasmaravillosas.int
+
+                                                                            Fabulas Maravillosas
+
+
+
+
+
+
+
+
+
+
+Commands: Use arrow keys to move, '?' for help, 'q' to quit, '<-' to go back.
+  Arrow keys: Up and Down to move.  Right to follow a link; Left to go back.
+ H)elp O)ptions P)rint G)o M)ain screen Q)uit /=search [delete]=history list 
+```
+```console
+lynx www.fabulasoscuras.int
+
+                                                                               Fabulas Oscuras
+
+
+
+
+
+
+
+
+
+
+Commands: Use arrow keys to move, '?' for help, 'q' to quit, '<-' to go back.
+  Arrow keys: Up and Down to move.  Right to follow a link; Left to go back.
+ H)elp O)ptions P)rint G)o M)ain screen Q)uit /=search [delete]=history list 
+```
